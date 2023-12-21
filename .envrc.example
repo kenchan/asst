@@ -1,0 +1,3 @@
+export SLACk_APP_TOKEN=<your-app-token>
+export SLACk_BOT_TOKEN=<your-bot-token>
+export DEBUG=true
