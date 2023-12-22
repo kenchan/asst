@@ -50,9 +50,11 @@ func main() {
 						_, _, err := client.PostMessage(ev.Channel, slack.MsgOptionText(ev.Text, false))
 						if err != nil {
 							log.Printf("failed posting message: %v", err)
+							continue
 						}
 					}
 				}
+				socketModeClient.Ack(*evt.Request)
 			}
 		}
 	}()
