@@ -5,33 +5,30 @@ import (
 	"log"
 	"os"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	openai "github.com/sashabaranov/go-openai"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 	"github.com/slack-go/slack/socketmode"
 )
 
-/* openaiclientでcompletion apiを叩く */
-func completion(client *azopenai.Client, prompt string) (string, error) {
-	modelDeplymentName := "gpt-3.5-turbo-1106"
-	resp, err := client.GetChatCompletions(
+func completion(client *openai.Client, prompt string) (string, error) {
+	resp, err := client.CreateChatCompletion(
 		context.TODO(),
-		azopenai.ChatCompletionsOptions{
-			Messages: []azopenai.ChatRequestMessageClassification{
-				&azopenai.ChatRequestUserMessage{
-					Content: azopenai.NewChatRequestUserMessageContent(prompt),
+		openai.ChatCompletionRequest{
+			Model: openai.GPT3Dot5Turbo1106,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role: openai.ChatMessageRoleUser,
+					Content: prompt,
 				},
 			},
-			DeploymentName: &modelDeplymentName,
 		},
-		nil,
 	)
 	if err != nil {
 		log.Fatal(err)
 		return "OpenAI API Error!!", err
 	}
-	return *resp.Choices[0].Message.Content, nil
+	return resp.Choices[0].Message.Content, nil
 }
 
 func main() {
@@ -58,11 +55,7 @@ func main() {
 		socketmode.OptionLog(log.New(os.Stdout, "socketmode: ", log.Lshortfile|log.LstdFlags)),
 	)
 
-	keyCredential := azcore.NewKeyCredential(openaiApiKey)
-	openaiClient, err := azopenai.NewClientForOpenAI("https://api.openai.com/v1", keyCredential, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	openaiClient := openai.NewClient(openaiApiKey)
 
 	go func() {
 		for evt := range socketModeClient.Events {
