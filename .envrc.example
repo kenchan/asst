@@ -1,4 +1,5 @@
 export SLACK_APP_TOKEN=<your-app-token>
 export SLACK_BOT_TOKEN=<your-bot-token>
 export OPENAI_API_KEY=<your-openai-api-key>
+export OPENAI_ASSISTANT_ID=<your-openai-assistant-id>
 export DEBUG=true
